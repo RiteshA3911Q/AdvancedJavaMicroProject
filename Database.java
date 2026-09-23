@@ -6,13 +6,42 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Database {
-    private static final String URL =
+    private static final String SERVER_URL =
+            "jdbc:mysql://localhost:3306/?serverTimezone=UTC";
+    private static final String DATABASE_URL =
             "jdbc:mysql://localhost:3306/marks_management?serverTimezone=UTC";
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
+    public Database() throws SQLException {
+        initializeDatabase();
+    }
+
     private Connection connect() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        return DriverManager.getConnection(DATABASE_URL, USER, PASSWORD);
+    }
+
+    private void initializeDatabase() throws SQLException {
+        String createDatabase = "CREATE DATABASE IF NOT EXISTS marks_management";
+        String createTable = "CREATE TABLE IF NOT EXISTS students ("
+                + "student_id VARCHAR(20) PRIMARY KEY, "
+                + "student_name VARCHAR(100) NOT NULL, "
+                + "subject1 INT NOT NULL, subject2 INT NOT NULL, "
+                + "subject3 INT NOT NULL, subject4 INT NOT NULL, "
+                + "subject5 INT NOT NULL, total INT NOT NULL, "
+                + "percentage DECIMAL(5,2) NOT NULL, grade VARCHAR(2) NOT NULL)";
+
+        try (Connection serverConnection = DriverManager.getConnection(
+                SERVER_URL, USER, PASSWORD);
+             PreparedStatement serverStatement =
+                     serverConnection.prepareStatement(createDatabase)) {
+            serverStatement.executeUpdate();
+        }
+
+        try (Connection connection = connect();
+             PreparedStatement statement = connection.prepareStatement(createTable)) {
+            statement.executeUpdate();
+        }
     }
 
     public void saveStudent(String id, String name, int[] marks, int total,

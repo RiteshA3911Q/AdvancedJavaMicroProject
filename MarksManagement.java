@@ -25,7 +25,7 @@ public class MarksManagement extends JFrame {
     private final JTextField searchField = new JTextField(12);
     private final DefaultTableModel tableModel;
     private final JTable table;
-    private final Database database = new Database();
+    private Database database;
 
     public MarksManagement() {
         setTitle("Student Marks Management System");
@@ -50,7 +50,12 @@ public class MarksManagement extends JFrame {
         table = new JTable(tableModel);
         tabs.addTab("Display", createDisplayPanel());
         add(tabs);
-        loadStudents("");
+        try {
+            database = new Database();
+            loadStudents("");
+        } catch (SQLException exception) {
+            showError("Could not initialize the database: " + exception.getMessage());
+        }
     }
 
     private JPanel createInputPanel() {
@@ -179,6 +184,9 @@ public class MarksManagement extends JFrame {
     }
 
     private void saveStudent() {
+        if (database == null) {
+            return;
+        }
         int[] marks = calculateResult();
         if (marks == null) {
             return;
@@ -196,6 +204,9 @@ public class MarksManagement extends JFrame {
     }
 
     private void updateStudent() {
+        if (database == null) {
+            return;
+        }
         int[] marks = calculateResult();
         if (marks == null) {
             return;
@@ -217,6 +228,9 @@ public class MarksManagement extends JFrame {
     }
 
     private void deleteStudent() {
+        if (database == null) {
+            return;
+        }
         String id = idField.getText().trim();
         if (id.isEmpty()) {
             showError("Enter a Student ID to delete.");
@@ -237,6 +251,9 @@ public class MarksManagement extends JFrame {
     }
 
     private void loadStudents(String searchId) {
+        if (database == null) {
+            return;
+        }
         try {
             ArrayList<Object[]> students = database.getStudents(searchId);
             tableModel.setRowCount(0);
