@@ -1,8 +1,15 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -13,6 +20,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 public class MarksManagement extends JFrame {
@@ -29,7 +37,7 @@ public class MarksManagement extends JFrame {
 
     public MarksManagement() {
         setTitle("Student Marks Management System");
-        setSize(950, 500);
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -48,6 +56,10 @@ public class MarksManagement extends JFrame {
             }
         };
         table = new JTable(tableModel);
+        table.setRowHeight(26);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.getTableHeader().setReorderingAllowed(false);
+        setColumnWidths();
         tabs.addTab("Display", createDisplayPanel());
         add(tabs);
         try {
@@ -59,64 +71,162 @@ public class MarksManagement extends JFrame {
     }
 
     private JPanel createInputPanel() {
-        JPanel panel = new JPanel(new BorderLayout(8, 8));
-        JPanel fields = new JPanel(new GridLayout(9, 2, 5, 5));
+        JPanel panel = new JPanel(new BorderLayout(12, 12));
+        panel.setBorder(BorderFactory.createEmptyBorder(18, 24, 18, 24));
 
-        fields.add(new JLabel("Student ID:"));
-        fields.add(idField);
-        fields.add(new JLabel("Student Name:"));
-        fields.add(nameField);
-        for (int i = 0; i < markFields.length; i++) {
-            markFields[i] = new JTextField();
-            fields.add(new JLabel("Subject " + (i + 1) + " Marks:"));
-            fields.add(markFields[i]);
-        }
-        fields.add(new JLabel("Total:"));
-        fields.add(totalField);
-        fields.add(new JLabel("Percentage:"));
-        fields.add(percentageField);
-        fields.add(new JLabel("Grade:"));
-        fields.add(gradeField);
+        JPanel form = new JPanel(new GridLayout(1, 3, 14, 0));
+        form.add(createStudentInfoPanel());
+        form.add(createSubjectPanel());
+        form.add(createResultPanel());
 
-        JPanel buttons = new JPanel(new FlowLayout());
-        JButton calculateButton = new JButton("Calculate");
-        JButton saveButton = new JButton("Save");
-        JButton updateButton = new JButton("Update");
-        JButton deleteButton = new JButton("Delete");
-        JButton clearButton = new JButton("Clear");
+        JLabel title = new JLabel("Enter Student Marks");
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 18f));
+        title.setBorder(BorderFactory.createEmptyBorder(0, 2, 4, 0));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 4));
+        JButton calculateButton = createButton("Calculate");
+        JButton saveButton = createButton("Save");
+        JButton updateButton = createButton("Update");
+        JButton deleteButton = createButton("Delete");
+        JButton clearButton = createButton("Clear");
         calculateButton.addActionListener(event -> calculateResult());
         saveButton.addActionListener(event -> saveStudent());
         updateButton.addActionListener(event -> updateStudent());
         deleteButton.addActionListener(event -> deleteStudent());
         clearButton.addActionListener(event -> clearFields());
-        buttons.add(calculateButton);
-        buttons.add(saveButton);
-        buttons.add(updateButton);
-        buttons.add(deleteButton);
-        buttons.add(clearButton);
+        buttonPanel.add(calculateButton);
+        buttonPanel.add(saveButton);
+        buttonPanel.add(updateButton);
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(clearButton);
 
-        panel.add(fields, BorderLayout.NORTH);
-        panel.add(buttons, BorderLayout.CENTER);
+        panel.add(title, BorderLayout.NORTH);
+        panel.add(form, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
         return panel;
     }
 
+    private JPanel createStudentInfoPanel() {
+        JPanel panel = createSectionPanel("Student Information");
+        JPanel fields = createFormFields();
+        addFieldRow(fields, "Student ID:", idField, 0);
+        addFieldRow(fields, "Student Name:", nameField, 1);
+        panel.add(fields, BorderLayout.NORTH);
+        return panel;
+    }
+
+    private JPanel createSubjectPanel() {
+        JPanel panel = createSectionPanel("Subject Marks");
+        JPanel fields = createFormFields();
+        for (int i = 0; i < markFields.length; i++) {
+            markFields[i] = new JTextField();
+            addFieldRow(fields, "Subject " + (i + 1) + ":", markFields[i], i);
+        }
+        panel.add(fields, BorderLayout.NORTH);
+        return panel;
+    }
+
+    private JPanel createResultPanel() {
+        JPanel panel = createSectionPanel("Result");
+        JPanel fields = createFormFields();
+        totalField.setEditable(false);
+        percentageField.setEditable(false);
+        gradeField.setEditable(false);
+        styleReadOnlyField(totalField);
+        styleReadOnlyField(percentageField);
+        styleReadOnlyField(gradeField);
+        addFieldRow(fields, "Total:", totalField, 0);
+        addFieldRow(fields, "Percentage:", percentageField, 1);
+        addFieldRow(fields, "Grade:", gradeField, 2);
+        panel.add(fields, BorderLayout.NORTH);
+        return panel;
+    }
+
+    private JPanel createSectionPanel(String title) {
+        JPanel panel = new JPanel(new BorderLayout());
+        TitledBorder border = BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(new Color(180, 190, 200)),
+                title);
+        border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD, 13f));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                border, BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        return panel;
+    }
+
+    private JPanel createFormFields() {
+        JPanel fields = new JPanel(new GridBagLayout());
+        fields.setOpaque(false);
+        return fields;
+    }
+
+    private void addFieldRow(JPanel panel, String labelText, JTextField field, int row) {
+        JLabel label = new JLabel(labelText);
+        label.setPreferredSize(new Dimension(105, 25));
+        styleField(field);
+        GridBagConstraints labelConstraints = new GridBagConstraints();
+        labelConstraints.gridx = 0;
+        labelConstraints.gridy = row;
+        labelConstraints.anchor = GridBagConstraints.LINE_START;
+        labelConstraints.insets = new Insets(4, 0, 4, 8);
+        panel.add(label, labelConstraints);
+
+        GridBagConstraints fieldConstraints = new GridBagConstraints();
+        fieldConstraints.gridx = 1;
+        fieldConstraints.gridy = row;
+        fieldConstraints.weightx = 1;
+        fieldConstraints.fill = GridBagConstraints.HORIZONTAL;
+        fieldConstraints.insets = new Insets(4, 0, 4, 0);
+        panel.add(field, fieldConstraints);
+    }
+
+    private void styleField(JTextField field) {
+        field.setPreferredSize(new Dimension(135, 28));
+        field.setMinimumSize(new Dimension(80, 28));
+    }
+
+    private void styleReadOnlyField(JTextField field) {
+        field.setBackground(new Color(238, 242, 246));
+    }
+
+    private JButton createButton(String text) {
+        JButton button = new JButton(text);
+        button.setPreferredSize(new Dimension(100, 32));
+        return button;
+    }
+
     private JPanel createDisplayPanel() {
-        JPanel panel = new JPanel(new BorderLayout(8, 8));
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton searchButton = new JButton("Search");
-        JButton refreshButton = new JButton("Refresh");
+        JPanel panel = new JPanel(new BorderLayout(12, 12));
+        panel.setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        searchPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(210, 215, 220)),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        JLabel searchLabel = new JLabel("Search Student ID:");
+        searchLabel.setFont(searchLabel.getFont().deriveFont(Font.BOLD));
+        styleField(searchField);
+        JButton searchButton = createButton("Search");
+        JButton refreshButton = createButton("Refresh");
         searchButton.addActionListener(event -> loadStudents(searchField.getText()));
         refreshButton.addActionListener(event -> {
             searchField.setText("");
             loadStudents("");
         });
-        searchPanel.add(new JLabel("Search Student ID:"));
+        searchPanel.add(searchLabel);
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
         searchPanel.add(refreshButton);
         panel.add(searchPanel, BorderLayout.NORTH);
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(180, 190, 200)));
+        panel.add(scrollPane, BorderLayout.CENTER);
         return panel;
+    }
+
+    private void setColumnWidths() {
+        int[] widths = {90, 150, 80, 80, 80, 80, 80, 75, 95, 65};
+        for (int i = 0; i < widths.length; i++) {
+            table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
+        }
     }
 
     private int[] readMarks() {

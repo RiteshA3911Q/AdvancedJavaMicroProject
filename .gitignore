@@ -1,3 +1,7 @@
 .venv
 .env
 AGENTS.md
+MarksManagement$1.class
+MarksManagement.class
+Database.class
+mysql-connector-j-26.7.0.jar
