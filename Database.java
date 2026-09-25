@@ -1,11 +1,8 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
-public class Database {
+public class Database
+{
     private static final String SERVER_URL =
             "jdbc:mysql://localhost:3306/?serverTimezone=UTC";
     private static final String DATABASE_URL =
@@ -13,15 +10,18 @@ public class Database {
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
-    public Database() throws SQLException {
+    public Database() throws SQLException
+    {
         initializeDatabase();
     }
 
-    private Connection connect() throws SQLException {
+    private Connection connect() throws SQLException
+    {
         return DriverManager.getConnection(DATABASE_URL, USER, PASSWORD);
     }
 
-    private void initializeDatabase() throws SQLException {
+    private void initializeDatabase() throws SQLException
+    {
         String createDatabase = "CREATE DATABASE IF NOT EXISTS marks_management";
         String createTable = "CREATE TABLE IF NOT EXISTS students ("
                 + "student_id VARCHAR(20) PRIMARY KEY, "
@@ -34,38 +34,44 @@ public class Database {
         try (Connection serverConnection = DriverManager.getConnection(
                 SERVER_URL, USER, PASSWORD);
              PreparedStatement serverStatement =
-                     serverConnection.prepareStatement(createDatabase)) {
+                     serverConnection.prepareStatement(createDatabase))
+        {
             serverStatement.executeUpdate();
         }
 
         try (Connection connection = connect();
-             PreparedStatement statement = connection.prepareStatement(createTable)) {
+             PreparedStatement statement = connection.prepareStatement(createTable))
+        {
             statement.executeUpdate();
         }
     }
 
     public void saveStudent(String id, String name, int[] marks, int total,
-                            double percentage, String grade) throws SQLException {
+                            double percentage, String grade) throws SQLException
+    {
         String sql = "INSERT INTO students "
                 + "(student_id, student_name, subject1, subject2, subject3, "
                 + "subject4, subject5, total, percentage, grade) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = connect();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql))
+        {
             setStudentValues(statement, id, name, marks, total, percentage, grade);
             statement.executeUpdate();
         }
     }
 
     public int updateStudent(String id, String name, int[] marks, int total,
-                             double percentage, String grade) throws SQLException {
+                             double percentage, String grade) throws SQLException
+    {
         String sql = "UPDATE students SET student_name = ?, subject1 = ?, "
                 + "subject2 = ?, subject3 = ?, subject4 = ?, subject5 = ?, "
                 + "total = ?, percentage = ?, grade = ? WHERE student_id = ?";
 
         try (Connection connection = connect();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql))
+            {
             statement.setString(1, name);
             statement.setInt(2, marks[0]);
             statement.setInt(3, marks[1]);
@@ -80,36 +86,45 @@ public class Database {
         }
     }
 
-    public int deleteStudent(String id) throws SQLException {
+    public int deleteStudent(String id) throws SQLException
+    {
         String sql = "DELETE FROM students WHERE student_id = ?";
 
         try (Connection connection = connect();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql))
+        {
             statement.setString(1, id);
             return statement.executeUpdate();
         }
     }
 
-    public ArrayList<Object[]> getStudents(String searchId) throws SQLException {
+    public ArrayList<Object[]> getStudents(String searchId) throws SQLException
+    {
         ArrayList<Object[]> students = new ArrayList<Object[]>();
         String sql = "SELECT student_id, student_name, subject1, subject2, "
                 + "subject3, subject4, subject5, total, percentage, grade "
                 + "FROM students";
 
-        if (searchId != null && !searchId.trim().isEmpty()) {
+        if (searchId != null && !searchId.trim().isEmpty())
+        {
             sql += " WHERE student_id = ?";
         }
         sql += " ORDER BY student_id";
 
         try (Connection connection = connect();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            if (searchId != null && !searchId.trim().isEmpty()) {
+             PreparedStatement statement = connection.prepareStatement(sql))
+        {
+            if (searchId != null && !searchId.trim().isEmpty())
+            {
                 statement.setString(1, searchId.trim());
             }
 
-            try (ResultSet result = statement.executeQuery()) {
-                while (result.next()) {
-                    students.add(new Object[] {
+            try (ResultSet result = statement.executeQuery())
+            {
+                while (result.next())
+                {
+                    students.add(new Object[]
+                        {
                             result.getString("student_id"),
                             result.getString("student_name"),
                             result.getInt("subject1"),
@@ -130,7 +145,8 @@ public class Database {
     private void setStudentValues(PreparedStatement statement, String id,
                                   String name, int[] marks, int total,
                                   double percentage, String grade)
-            throws SQLException {
+            throws SQLException
+    {
         statement.setString(1, id);
         statement.setString(2, name);
         statement.setInt(3, marks[0]);

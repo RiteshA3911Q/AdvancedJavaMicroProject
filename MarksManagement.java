@@ -1,29 +1,12 @@
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import java.awt.*;
+import javax.swing.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
-public class MarksManagement extends JFrame {
+public class MarksManagement extends JFrame
+{
     private final JTextField idField = new JTextField();
     private final JTextField nameField = new JTextField();
     private final JTextField[] markFields = new JTextField[5];
@@ -35,7 +18,8 @@ public class MarksManagement extends JFrame {
     private final JTable table;
     private Database database;
 
-    public MarksManagement() {
+    public MarksManagement()
+{
         setTitle("Student Marks Management System");
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -48,10 +32,13 @@ public class MarksManagement extends JFrame {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Input", createInputPanel());
 
-        String[] columns = {"Student ID", "Student Name", "Subject 1", "Subject 2",
+        String[] columns =
+        {"Student ID", "Student Name", "Subject 1", "Subject 2",
                 "Subject 3", "Subject 4", "Subject 5", "Total", "Percentage", "Grade"};
-        tableModel = new DefaultTableModel(columns, 0) {
-            public boolean isCellEditable(int row, int column) {
+        tableModel = new DefaultTableModel(columns, 0)
+        {
+            public boolean isCellEditable(int row, int column)
+            {
                 return false;
             }
         };
@@ -62,15 +49,18 @@ public class MarksManagement extends JFrame {
         setColumnWidths();
         tabs.addTab("Display", createDisplayPanel());
         add(tabs);
-        try {
+        try
+        {
             database = new Database();
             loadStudents("");
-        } catch (SQLException exception) {
+        } catch (SQLException exception)
+        {
             showError("Could not initialize the database: " + exception.getMessage());
         }
     }
 
-    private JPanel createInputPanel() {
+    private JPanel createInputPanel()
+    {
         JPanel panel = new JPanel(new BorderLayout(12, 12));
         panel.setBorder(BorderFactory.createEmptyBorder(18, 24, 18, 24));
 
@@ -106,7 +96,8 @@ public class MarksManagement extends JFrame {
         return panel;
     }
 
-    private JPanel createStudentInfoPanel() {
+    private JPanel createStudentInfoPanel()
+{
         JPanel panel = createSectionPanel("Student Information");
         JPanel fields = createFormFields();
         addFieldRow(fields, "Student ID:", idField, 0);
@@ -115,10 +106,12 @@ public class MarksManagement extends JFrame {
         return panel;
     }
 
-    private JPanel createSubjectPanel() {
+    private JPanel createSubjectPanel()
+{
         JPanel panel = createSectionPanel("Subject Marks");
         JPanel fields = createFormFields();
-        for (int i = 0; i < markFields.length; i++) {
+        for (int i = 0; i < markFields.length; i++)
+{
             markFields[i] = new JTextField();
             addFieldRow(fields, "Subject " + (i + 1) + ":", markFields[i], i);
         }
@@ -126,7 +119,8 @@ public class MarksManagement extends JFrame {
         return panel;
     }
 
-    private JPanel createResultPanel() {
+    private JPanel createResultPanel()
+    {
         JPanel panel = createSectionPanel("Result");
         JPanel fields = createFormFields();
         totalField.setEditable(false);
@@ -142,7 +136,8 @@ public class MarksManagement extends JFrame {
         return panel;
     }
 
-    private JPanel createSectionPanel(String title) {
+    private JPanel createSectionPanel(String title)
+    {
         JPanel panel = new JPanel(new BorderLayout());
         TitledBorder border = BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(new Color(180, 190, 200)),
@@ -153,13 +148,15 @@ public class MarksManagement extends JFrame {
         return panel;
     }
 
-    private JPanel createFormFields() {
+    private JPanel createFormFields()
+    {
         JPanel fields = new JPanel(new GridBagLayout());
         fields.setOpaque(false);
         return fields;
     }
 
-    private void addFieldRow(JPanel panel, String labelText, JTextField field, int row) {
+    private void addFieldRow(JPanel panel, String labelText, JTextField field, int row)
+    {
         JLabel label = new JLabel(labelText);
         label.setPreferredSize(new Dimension(105, 25));
         styleField(field);
@@ -179,22 +176,26 @@ public class MarksManagement extends JFrame {
         panel.add(field, fieldConstraints);
     }
 
-    private void styleField(JTextField field) {
+    private void styleField(JTextField field)
+    {
         field.setPreferredSize(new Dimension(135, 28));
         field.setMinimumSize(new Dimension(80, 28));
     }
 
-    private void styleReadOnlyField(JTextField field) {
+    private void styleReadOnlyField(JTextField field)
+    {
         field.setBackground(new Color(238, 242, 246));
     }
 
-    private JButton createButton(String text) {
+    private JButton createButton(String text)
+    {
         JButton button = new JButton(text);
         button.setPreferredSize(new Dimension(100, 32));
         return button;
     }
 
-    private JPanel createDisplayPanel() {
+    private JPanel createDisplayPanel()
+    {
         JPanel panel = new JPanel(new BorderLayout(12, 12));
         panel.setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
@@ -207,7 +208,8 @@ public class MarksManagement extends JFrame {
         JButton searchButton = createButton("Search");
         JButton refreshButton = createButton("Refresh");
         searchButton.addActionListener(event -> loadStudents(searchField.getText()));
-        refreshButton.addActionListener(event -> {
+        refreshButton.addActionListener(event ->
+        {
             searchField.setText("");
             loadStudents("");
         });
@@ -222,49 +224,64 @@ public class MarksManagement extends JFrame {
         return panel;
     }
 
-    private void setColumnWidths() {
-        int[] widths = {90, 150, 80, 80, 80, 80, 80, 75, 95, 65};
-        for (int i = 0; i < widths.length; i++) {
+    private void setColumnWidths()
+    {
+        int[] widths =
+        {90, 150, 80, 80, 80, 80, 80, 75, 95, 65};
+        for (int i = 0; i < widths.length; i++)
+        {
             table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
         }
     }
 
-    private int[] readMarks() {
+    private int[] readMarks()
+    {
         int[] marks = new int[5];
-        for (int i = 0; i < markFields.length; i++) {
-            try {
+        for (int i = 0; i < markFields.length; i++)
+        {
+            try
+            {
                 marks[i] = Integer.parseInt(markFields[i].getText().trim());
-            } catch (NumberFormatException exception) {
+            } catch (NumberFormatException exception)
+            {
                 throw new IllegalArgumentException("Enter a whole number for Subject "
                         + (i + 1) + ".");
             }
-            if (marks[i] < 0 || marks[i] > 100) {
+            if (marks[i] < 0 || marks[i] > 100)
+            {
                 throw new IllegalArgumentException("Each mark must be between 0 and 100.");
             }
         }
         return marks;
     }
 
-    private boolean hasRequiredDetails() {
-        if (idField.getText().trim().isEmpty()) {
+    private boolean hasRequiredDetails()
+    {
+        if (idField.getText().trim().isEmpty())
+        {
             showError("Student ID is required.");
             return false;
         }
-        if (nameField.getText().trim().isEmpty()) {
+        if (nameField.getText().trim().isEmpty())
+        {
             showError("Student name is required.");
             return false;
         }
         return true;
     }
 
-    private int[] calculateResult() {
-        if (!hasRequiredDetails()) {
+    private int[] calculateResult()
+    {
+        if (!hasRequiredDetails())
+        {
             return null;
         }
-        try {
+        try
+        {
             int[] marks = readMarks();
             int total = 0;
-            for (int mark : marks) {
+            for (int mark : marks)
+            {
                 total += mark;
             }
             double percentage = total / 5.0;
@@ -272,113 +289,146 @@ public class MarksManagement extends JFrame {
             percentageField.setText(String.format("%.2f", percentage));
             gradeField.setText(getGrade(percentage));
             return marks;
-        } catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException exception)
+        {
             showError(exception.getMessage());
             return null;
         }
     }
 
-    private String getGrade(double percentage) {
-        if (percentage >= 90) {
+    private String getGrade(double percentage)
+    {
+        if (percentage >= 90)
+        {
             return "A+";
-        } else if (percentage >= 80) {
+        } else if (percentage >= 80)
+        {
             return "A";
-        } else if (percentage >= 70) {
+        } else if (percentage >= 70)
+        {
             return "B";
-        } else if (percentage >= 60) {
+        } else if (percentage >= 60)
+        {
             return "C";
-        } else if (percentage >= 50) {
+        } else if (percentage >= 50)
+        {
             return "D";
         }
         return "F";
     }
 
-    private void saveStudent() {
-        if (database == null) {
+    private void saveStudent()
+    {
+        if (database == null)
+        {
             return;
         }
         int[] marks = calculateResult();
-        if (marks == null) {
+        if (marks == null)
+        {
             return;
         }
-        try {
+        try
+        {
             database.saveStudent(idField.getText().trim(), nameField.getText().trim(),
                     marks, Integer.parseInt(totalField.getText()),
                     Double.parseDouble(percentageField.getText()), gradeField.getText());
             JOptionPane.showMessageDialog(this, "Student saved successfully.");
             loadStudents("");
             clearFields();
-        } catch (SQLException exception) {
+        } catch (SQLException exception)
+        {
             showError("Could not save student: " + exception.getMessage());
         }
     }
 
-    private void updateStudent() {
-        if (database == null) {
+    private void updateStudent()
+    {
+        if (database == null)
+        {
             return;
         }
         int[] marks = calculateResult();
-        if (marks == null) {
+        if (marks == null)
+        {
             return;
         }
-        try {
+        try
+        {
             int updated = database.updateStudent(idField.getText().trim(),
                     nameField.getText().trim(),
                     marks, Integer.parseInt(totalField.getText()),
                     Double.parseDouble(percentageField.getText()), gradeField.getText());
-            if (updated == 0) {
+            if (updated == 0)
+            {
                 showError("No student found with that ID.");
-            } else {
+            } else
+            {
                 JOptionPane.showMessageDialog(this, "Student updated successfully.");
                 loadStudents("");
             }
-        } catch (SQLException exception) {
+        } catch (SQLException exception)
+        {
             showError("Could not update student: " + exception.getMessage());
         }
     }
 
-    private void deleteStudent() {
-        if (database == null) {
+    private void deleteStudent()
+    {
+        if (database == null)
+        {
             return;
         }
         String id = idField.getText().trim();
-        if (id.isEmpty()) {
+        if (id.isEmpty())
+        {
             showError("Enter a Student ID to delete.");
             return;
         }
-        try {
+        try
+        {
             int deleted = database.deleteStudent(id);
-            if (deleted == 0) {
+            if (deleted == 0)
+            {
                 showError("No student found with that ID.");
-            } else {
+            } else
+            {
                 JOptionPane.showMessageDialog(this, "Student deleted successfully.");
                 loadStudents("");
                 clearFields();
             }
-        } catch (SQLException exception) {
+        } catch (SQLException exception)
+        {
             showError("Could not delete student: " + exception.getMessage());
         }
     }
 
-    private void loadStudents(String searchId) {
-        if (database == null) {
+    private void loadStudents(String searchId)
+    {
+        if (database == null)
+        {
             return;
         }
-        try {
+        try
+        {
             ArrayList<Object[]> students = database.getStudents(searchId);
             tableModel.setRowCount(0);
-            for (Object[] student : students) {
+            for (Object[] student : students)
+            {
                 tableModel.addRow(student);
             }
-        } catch (SQLException exception) {
+        } catch (SQLException exception)
+        {
             showError("Could not load students: " + exception.getMessage());
         }
     }
 
-    private void clearFields() {
+    private void clearFields()
+    {
         idField.setText("");
         nameField.setText("");
-        for (JTextField field : markFields) {
+        for (JTextField field : markFields)
+        {
             field.setText("");
         }
         totalField.setText("");
@@ -386,11 +436,13 @@ public class MarksManagement extends JFrame {
         gradeField.setText("");
     }
 
-    private void showError(String message) {
+    private void showError(String message)
+    {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         SwingUtilities.invokeLater(() -> new MarksManagement().setVisible(true));
     }
 }
